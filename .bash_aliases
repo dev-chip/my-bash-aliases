@@ -17,6 +17,10 @@ alias gr='git revert'
 alias gs='git status && git diff --stat'
 alias gu='git reset --mixed HEAD'
 alias gp='git push'
+alias gclean='git clean -fdx'
+function gbclean() {
+    git fetch -p && for branch in $(git branch -vv | grep ': gone]' | awk '{print $1}'); do git branch -D $branch; done
+}
 function gpfirst() {
     git push -u origin $( git rev-parse --abbrev-ref HEAD )
 }
