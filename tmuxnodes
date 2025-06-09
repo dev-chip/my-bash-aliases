@@ -1,0 +1,29 @@
+#!/bin/bash -e
+
+# Usage: ./ssh_tmux.sh host1 host2 host3 ...
+
+# Check if at least one host was provided
+if [ "$#" -lt 1 ]; then
+  echo "Usage: $0 host1 host2 ..."
+  exit 1
+fi
+
+SESSION_NAME="ssh_session"
+
+# Clean existing previous session and return true even if the command errors
+tmux kill-session -t $SESSION_NAME || true
+
+# Start a new tmux session in detached mode
+tmux new-session -d -s "$SESSION_NAME" "export NODE=${1}; echo NODE=${1}; bash"
+
+# Shift so we can loop through remaining hosts
+shift
+
+# For each remaining host, create a new pane and set the NODE environment variable
+for NODE in "$@"; do
+  tmux split-window -t "$SESSION_NAME" -h "export NODE=$NODE; echo NODE=$NODE; bash"
+  tmux select-layout -t "$SESSION_NAME" tiled
+done
+
+# Attach to the tmux session
+tmux attach-session -t "$SESSION_NAME"
