@@ -1,15 +1,39 @@
 #!/bin/bash
-# Include any branches for which you wish to disable this script
-if [ -z "$BRANCHES_TO_SKIP" ]; then
-  BRANCHES_TO_SKIP=(master develop integration staging test)
+#
+# This script will prepend your commit message with a relevant emoji
+# if you use the conventional commit message format.
+
+COMMIT_MSG_FILE="$1"
+COMMIT_MSG=$(head -n1 "$COMMIT_MSG_FILE")
+
+# Define emoji shortcodes for commit types
+declare -A EMOJIS=(
+  ["feat"]=":sparkles:"
+  ["fix"]=":bug:"
+  ["docs"]=":memo:"
+  ["style"]=":lipstick:"
+  ["refactor"]=":recycle:"
+  ["perf"]=":zap:"
+  ["test"]=":white_check_mark:"
+  ["build"]=":building_construction:"
+  ["ci"]=":construction_worker:"
+  ["chore"]=":wrench:"
+  ["revert"]=":rewind:"
+)
+
+# Extract the commit type (e.g., feat from feat: or feat(auth):)
+TYPE=$(echo "$COMMIT_MSG" | sed -E 's/([a-z]+):.*/\1/')
+
+# Lookup corresponding emoji shortcode
+EMOJI="${EMOJIS[$TYPE]}"
+
+# If emoji exists and isn't already present, prepend it
+if [[ -n "$EMOJI" && "$COMMIT_MSG" != "$EMOJI"* ]]; then
+  # Preserve the rest of the commit message
+  tail -n +2 "$COMMIT_MSG_FILE" > "$COMMIT_MSG_FILE.tmp"
+  echo "$EMOJI $COMMIT_MSG" > "$COMMIT_MSG_FILE"
+  cat "$COMMIT_MSG_FILE.tmp" >> "$COMMIT_MSG_FILE"
+  rm "$COMMIT_MSG_FILE.tmp"
 fi
-# Get the current branch name and check if it is excluded
-BRANCH_NAME=$(git symbolic-ref --short HEAD)
-BRANCH_EXCLUDED=$(printf "%s\n" "${BRANCHES_TO_SKIP[@]}" | grep -c "^$BRANCH_NAME$")
-# Trim it down to get the parts we're interested in
-TRIMMED=$(echo $BRANCH_NAME | sed -e 's:^\([^-_]*-[^-_]*\)[_-].*:\1:' -e \
-    'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
-# If it isn't excluded, preprend the trimmed branch identifier to the given message
-if [ -n "$BRANCH_NAME" ] &&  ! [[ $BRANCH_EXCLUDED -eq 1 ]]; then
-  sed -i.bak -e "1s/^/$TRIMMED /" $1
-fi
+
+exit 0
