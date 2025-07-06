@@ -1,19 +1,25 @@
-# my-bash-aliases
-My personal bash aliases for development on Linux/Unix systems, as well as other configuration files.
+# my-development-environment
+My personal development environment for Linux systems.
 
-## Setup of command auto-complete on Ubuntu
-1. Run `sudo vim /etc/inputrc`
-2. find the lines:
+## Install
+To setup the development environment:
 ```bash
-# alternate mappings for "page up" and "page down" to search the history
-# "\e[5~": history-search-backward
-# "\e[6~": history-search-forward
+./deploy.sh
 ```
-3. Remove the # to uncomment the two lines:
+
+## Grab
+To copy current development environment configuration assets into this repository so they can be commited and shared:
+```bash
+./grab.sh
+```
+
+## Enable Bash command history search
+Additionally, I like to enable history-search mappings: 
+1. Run `sudo vim /etc/inputrc`
+2. Find and uncomment the following alternate mappings for `"\e[5~"` and `"\e[6~"`:
 ```bash
 # alternate mappings for "page up" and "page down" to search the history
 "\e[5~": history-search-backward
 "\e[6~": history-search-forward
 ```
-
-*[StackExchange source](https://askubuntu.com/questions/144969/terminal-command-autocomplete)*
+3. Find and comment any other lines with mappings for `"\e[5~"` and `"\e[6~"`.
