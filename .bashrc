@@ -8,3 +8,6 @@ fi
 if [[ -f ~/.bash_aliases ]]; then 
 	. ~/.bash_aliases
 fi
+
+# Add to PATH
+export PATH=$PATH:~/.local/bin
