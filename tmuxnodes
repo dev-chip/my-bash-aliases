@@ -8,7 +8,7 @@ if [ "$#" -lt 1 ]; then
   exit 1
 fi
 
-SESSION_NAME="ssh_session"
+SESSION_NAME="session_`date +%s%N`"
 
 # Clean existing previous session and return true even if the command errors
 tmux kill-session -t $SESSION_NAME || true
